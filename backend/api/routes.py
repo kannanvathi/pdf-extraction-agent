@@ -17,6 +17,7 @@ from typing import AsyncIterator
 import aiofiles
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
+from pydantic import BaseModel
 
 from backend.config import get_settings, PROVIDER_REGISTRY
 from backend.db.repository import ExtractionRepository
@@ -262,6 +263,33 @@ async def serve_pdf(
         filename=display,
         headers={"Cache-Control": "max-age=3600"},
     )
+
+
+# ---------------------------------------------------------------------------
+# PATCH /extractions/{doc_id}/claims  — save structured claim rows
+# ---------------------------------------------------------------------------
+
+class ClaimsPayload(BaseModel):
+    claim_id_column:     str         # display label of the chosen column
+    claim_id_col_idx:    int         # 0-based index in the spatial grid
+    rows: list[dict]                 # [{claim_id, row_index, data: {col: val}}]
+
+
+@router.patch("/extractions/{doc_id}/claims", summary="Save claim-keyed rows to a document")
+async def save_claims(
+    doc_id:  str,
+    payload: ClaimsPayload,
+    repo:    ExtractionRepository = Depends(get_repo),
+):
+    ok = await repo.save_claims(doc_id, payload.claim_id_column, payload.rows)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Document not found.")
+    return {
+        "ok":          True,
+        "doc_id":      doc_id,
+        "claim_count": len(payload.rows),
+        "column":      payload.claim_id_column,
+    }
 
 
 # ---------------------------------------------------------------------------

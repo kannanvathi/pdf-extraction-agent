@@ -159,7 +159,34 @@ class ExtractionRepository:
         )
         return [_serialize(doc) async for doc in cursor]
 
-    # --- 6. Filter by document type ---
+    # --- 6. Save structured claim rows (keeps raw data intact) ---
+
+    async def save_claims(
+        self,
+        doc_id: str,
+        claim_id_column: str,
+        claim_rows: list[dict],
+    ) -> bool:
+        """
+        Upsert claim_rows into an existing extraction document.
+        Raw fields (full_text, pages, table_data …) are untouched.
+        Returns True if a document was matched and updated.
+        """
+        from bson import ObjectId
+
+        try:
+            oid = ObjectId(doc_id)
+        except Exception:
+            return False
+
+        update = _sanitize({
+            "claim_id_column": claim_id_column,
+            "claim_rows":      claim_rows,
+        })
+        result = await self._col.update_one({"_id": oid}, {"$set": update})
+        return result.matched_count > 0
+
+    # --- 7. Filter by document type ---
 
     async def list_by_type(
         self,

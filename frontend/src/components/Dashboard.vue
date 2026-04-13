@@ -150,6 +150,7 @@
               v-else-if="activePdfUrl"
               :pdf-url="activePdfUrl"
               :pages="fullDoc?.pages ?? []"
+              :doc-id="activeDoc?._id ?? null"
             />
           </div>
 

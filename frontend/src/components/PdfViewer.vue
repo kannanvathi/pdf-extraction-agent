@@ -248,6 +248,114 @@
       </div>
     </div>
 
+    <!-- ── Claim ID Table ────────────────────────────────────────────────── -->
+    <div
+      v-if="tableMode === 'spatial' && spatialTable.cols.length"
+      class="mt-4 rounded-xl border border-gray-200 overflow-hidden bg-white"
+    >
+      <!-- header bar -->
+      <div class="flex items-center gap-3 px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex-wrap">
+        <span class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Claim ID Mapping</span>
+
+        <!-- column selector -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-gray-500">Claim ID column</label>
+          <select
+            v-model.number="claimColIdx"
+            class="rounded-lg border border-gray-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          >
+            <option :value="null">— select —</option>
+            <option v-for="(col, i) in spatialTable.cols" :key="i" :value="i">
+              {{ col.label }} (x≈{{ Math.round(col.x) }})
+            </option>
+          </select>
+        </div>
+
+        <span class="text-xs text-gray-400" v-if="claimColIdx !== null">
+          {{ claimRows.length }} claim row{{ claimRows.length !== 1 ? 's' : '' }}
+        </span>
+
+        <div class="ml-auto flex items-center gap-3">
+          <!-- save status -->
+          <span
+            v-if="claimSaveMsg"
+            class="text-xs font-medium"
+            :class="claimSaveMsg.startsWith('✓') ? 'text-emerald-600' : 'text-red-500'"
+          >{{ claimSaveMsg }}</span>
+
+          <!-- save button -->
+          <button
+            v-if="docId && claimColIdx !== null && claimRows.length"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+            :class="savingClaims
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-indigo-600 hover:bg-indigo-700 text-white'"
+            :disabled="savingClaims"
+            @click="saveClaims"
+          >
+            <svg v-if="savingClaims" class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            {{ savingClaims ? 'Saving…' : 'Save to MongoDB' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- empty state -->
+      <div v-if="claimColIdx === null" class="px-4 py-6 text-center text-xs text-gray-400">
+        Select a column above to map claim IDs.
+      </div>
+      <div v-else-if="!claimRows.length" class="px-4 py-6 text-center text-xs text-gray-400">
+        No rows with a non-empty value in the selected column.
+      </div>
+
+      <!-- claim table -->
+      <div v-else class="overflow-auto" style="max-height: 320px;">
+        <table class="w-full text-xs border-collapse">
+          <thead class="sticky top-0 z-10">
+            <tr class="bg-gray-50 text-[0.65rem] uppercase tracking-wide">
+              <th class="px-3 py-2 text-left font-semibold text-indigo-600 border-b border-gray-200 whitespace-nowrap">
+                Claim ID
+                <span class="ml-1 font-normal normal-case text-indigo-400">
+                  ({{ spatialTable.cols[claimColIdx]?.label }})
+                </span>
+              </th>
+              <th
+                v-for="(col, ci) in spatialTable.cols.filter((_, i) => i !== claimColIdx)"
+                :key="ci"
+                class="px-3 py-2 text-left font-semibold text-gray-500 border-b border-gray-200 whitespace-nowrap"
+              >{{ col.label }}</th>
+              <th class="px-3 py-2 text-right font-semibold text-gray-400 border-b border-gray-200 w-12">#</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(row, ri) in claimRows"
+              :key="ri"
+              class="border-b border-gray-100 hover:bg-indigo-50 transition-colors"
+            >
+              <!-- Claim ID cell — highlighted -->
+              <td class="px-3 py-1.5 font-semibold text-indigo-700 whitespace-nowrap">
+                <span class="inline-block bg-indigo-100 text-indigo-700 rounded px-1.5 py-0.5 font-mono text-[0.65rem]">
+                  {{ row.claim_id }}
+                </span>
+              </td>
+              <!-- Other data cells -->
+              <td
+                v-for="(col, ci) in spatialTable.cols.filter((_, i) => i !== claimColIdx)"
+                :key="ci"
+                class="px-3 py-1.5 text-gray-700 max-w-xs"
+                style="word-break: break-word;"
+              >{{ row.data[col.label] }}</td>
+              <!-- Row index -->
+              <td class="px-3 py-1.5 text-gray-400 tabular-nums text-right">{{ row.row_index + 1 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -257,8 +365,11 @@ import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 const props = defineProps({
   pdfUrl: { type: String, required: true },
   pages:  { type: Array, default: () => [] },
+  docId:  { type: String, default: null },   // MongoDB _id — enables claim save
 })
 const emit = defineEmits(['update:item'])
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
 
 // ── PDF state ──────────────────────────────────────────────────────────────
 const canvasEl      = ref(null)
@@ -552,6 +663,66 @@ function saveEdit() {
 // ── Key helpers ────────────────────────────────────────────────────────────
 function rawEditKey(idx)    { return `${currentPage.value}:${idx}` }
 function groupEditKey(ri, ci) { return `${currentPage.value}:${ri}:${ci}` }
+
+// ── Claim ID mapping ───────────────────────────────────────────────────────
+const claimColIdx    = ref(null)     // index of the claim-id column in spatialTable.cols
+const savingClaims   = ref(false)
+const claimSaveMsg   = ref('')       // feedback after save
+
+// Auto-detect claim ID column: look for "claim" in column label when cols change
+watch(
+  () => spatialTable.value.cols,
+  (cols) => {
+    if (claimColIdx.value !== null) return   // already chosen
+    const idx = cols.findIndex(c =>
+      /claim[\s_-]?(no|id|num|number|#)?/i.test(c.label)
+    )
+    if (idx >= 0) claimColIdx.value = idx
+  },
+  { immediate: true }
+)
+
+// Rows keyed by claim ID — built from the current spatial table
+const claimRows = computed(() => {
+  const { cols, rows } = spatialTable.value
+  if (!cols.length || claimColIdx.value === null) return []
+
+  return rows
+    .map((row, ri) => ({
+      claim_id:  (row[claimColIdx.value] ?? '').trim(),
+      row_index: ri,
+      data: Object.fromEntries(cols.map((col, ci) => [col.label, row[ci] ?? ''])),
+    }))
+    .filter(r => r.claim_id)          // skip rows with no claim ID value
+})
+
+async function saveClaims() {
+  if (!props.docId || claimColIdx.value === null) return
+  savingClaims.value = true
+  claimSaveMsg.value = ''
+  try {
+    const col = spatialTable.value.cols[claimColIdx.value]
+    const res = await fetch(`${API}/extractions/${props.docId}/claims`, {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        claim_id_column:  col.label,
+        claim_id_col_idx: claimColIdx.value,
+        rows:             claimRows.value,
+      }),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.detail ?? `HTTP ${res.status}`)
+    }
+    const data = await res.json()
+    claimSaveMsg.value = `✓ ${data.claim_count} claim row${data.claim_count !== 1 ? 's' : ''} saved`
+  } catch (e) {
+    claimSaveMsg.value = `Error: ${e.message}`
+  } finally {
+    savingClaims.value = false
+  }
+}
 
 // ── Misc ───────────────────────────────────────────────────────────────────
 function fmtNum(v) {

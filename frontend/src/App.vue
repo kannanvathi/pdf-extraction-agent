@@ -110,6 +110,7 @@
           v-if="store.pdfUrl"
           :pdf-url="store.pdfUrl"
           :pages="store.result?.pages ?? []"
+          :doc-id="store.result?._id ?? null"
         />
       </div>
 
