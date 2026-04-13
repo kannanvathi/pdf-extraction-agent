@@ -1,4 +1,5 @@
 services:
+  # ── Backend API ────────────────────────────────────────────────────────
   - type: web
     name: pdf-extraction-api
     runtime: python
@@ -12,6 +13,8 @@ services:
         value: "1"
       - key: UPLOAD_DIR
         value: /tmp/pdf_uploads
+      - key: CORS_ORIGINS
+        value: '["https://pdf-extraction-frontend.onrender.com", "http://localhost:5173"]'
       - key: ACTIVE_PROVIDER
         sync: false
       - key: MONGODB_URL
@@ -26,5 +29,14 @@ services:
         sync: false
       - key: LLAMA_CLOUD_API_KEY
         sync: false
-      - key: CORS_ORIGINS
-        sync: false
+
+  # ── Frontend static site ───────────────────────────────────────────────
+  - type: web
+    name: pdf-extraction-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://pdf-extraction-agent.onrender.com/api/v1
