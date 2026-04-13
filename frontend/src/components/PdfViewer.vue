@@ -579,12 +579,15 @@ async function loadDocument() {
     pdfDoc = await pdfjsLib.getDocument(props.pdfUrl).promise
     totalPages.value  = pdfDoc.numPages
     currentPage.value = 1
-    await renderPage()
   } catch (err) {
     loadError.value = `Failed to load PDF: ${err.message}`
   } finally {
+    // Must set isLoading = false BEFORE renderPage() so the canvas
+    // element (inside v-else) exists in the DOM when we try to draw.
     isLoading.value = false
   }
+  // Render only if loading succeeded (no error, pdfDoc is ready)
+  if (pdfDoc && !loadError.value) await renderPage()
 }
 
 async function renderPage() {
