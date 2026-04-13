@@ -1,6 +1,12 @@
 {
+  "projectId": "prj_DmDMUQOrxg0RxXYjwE7WMXE215jb",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://pdf-extraction-agent.onrender.com/api/v1"
+    }
+  }
 }
