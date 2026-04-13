@@ -1,5 +1,4 @@
 {
-  "projectId": "prj_DmDMUQOrxg0RxXYjwE7WMXE215jb",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
