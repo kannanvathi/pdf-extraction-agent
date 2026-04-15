@@ -22,8 +22,8 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(
-        title="PDF Extraction Agent API",
-        version="1.0.0",
+        title="Loss Run Extraction Agent API",
+        version="2.0.0",
         lifespan=lifespan,
     )
     app.add_middleware(

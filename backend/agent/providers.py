@@ -221,13 +221,14 @@ def run_llamaparse(file_path: str, result_type: str, api_key: str) -> str:
         log.warning("pdfplumber page count failed: %s", exc)
 
     envelope = {
-        "doc_type": "document",
+        "doc_type": "lossrun",
         "page_count": page_count,
         "extracted_at": datetime.datetime.utcnow().isoformat() + "Z",
-        "fields": {},
+        "policy_info": {},
+        "policy_periods": [],
+        "claims": [],
         "table_data": tables,
-        "entities": {"persons": [], "orgs": [], "dates": [], "amounts": []},
-        "summary": full_text[:600].strip(),
+        "summary": {},
         "full_text": full_text,
         "parser": f"llamaparse/{result_type}",
         "errors": [],
@@ -307,13 +308,14 @@ def run_liteparse(file_path: str) -> str:
     log.info("LiteParse: %d pages, %d tables, %d chars", page_count, len(tables), len(full_text))
 
     envelope = {
-        "doc_type": "document",
+        "doc_type": "lossrun",
         "page_count": page_count,
         "extracted_at": datetime.datetime.utcnow().isoformat() + "Z",
-        "fields": {},
+        "policy_info": {},
+        "policy_periods": [],
+        "claims": [],
         "table_data": tables,
-        "entities": {"persons": [], "orgs": [], "dates": [], "amounts": []},
-        "summary": full_text[:600].strip(),
+        "summary": {},
         "full_text": full_text,
         "pages": pages_data,
         "parser": "liteparse",

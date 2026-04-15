@@ -133,13 +133,13 @@ async def list_providers():
 # POST /extract  — upload + queue
 # ---------------------------------------------------------------------------
 
-@router.post("/extract", summary="Upload a PDF and start extraction")
+@router.post("/extract", summary="Upload a loss run PDF and start extraction")
 async def extract_pdf(
     request: Request,
-    file: UploadFile = File(..., description="PDF file to extract"),
+    file: UploadFile = File(..., description="Loss run PDF to extract"),
     user_id: str | None = Form(None),
-    doc_type: str | None = Form(None, description="invoice|contract|resume|report|form"),
-    provider: str | None = Form(None, description="llamaparse|openai|gemini|anthropic"),
+    doc_type: str | None = Form(None, description="Always treated as lossrun"),
+    provider: str | None = Form(None, description="llamaparse|openai|gemini|anthropic|liteparse"),
     model: str | None = Form(None, description="Model override e.g. gpt-4o or markdown/text for llamaparse"),
 ):
     settings = get_settings()
@@ -180,7 +180,7 @@ async def extract_pdf(
     _job_queues[job_id] = queue
 
     asyncio.create_task(
-        _run_extraction(job_id, str(dest), user_id, doc_type,
+        _run_extraction(job_id, str(dest), user_id, "lossrun",
                         active_provider, model, queue, repo)
     )
 

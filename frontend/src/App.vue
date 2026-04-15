@@ -3,9 +3,9 @@
     <!-- Top nav -->
     <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3">
       <svg class="h-7 w-7 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/>
       </svg>
-      <span class="text-lg font-bold tracking-tight">PDF Extraction Agent</span>
+      <span class="text-lg font-bold tracking-tight">Loss Run Extraction Agent</span>
       <nav class="ml-auto flex gap-1">
         <button
           v-for="tab in tabs"

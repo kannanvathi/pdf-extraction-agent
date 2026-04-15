@@ -16,14 +16,11 @@
         >
           <span class="text-base">{{ providerIcon(p.id) }}</span>
           <span>{{ p.label }}</span>
-          <span
-            v-if="!p.available"
-            class="text-xs opacity-50"
-          >no key</span>
+          <span v-if="!p.available" class="text-xs opacity-50">no key</span>
         </button>
       </div>
 
-      <!-- Model selector for active provider -->
+      <!-- Model selector -->
       <div v-if="store.currentProvider" class="mt-3 flex items-center gap-2">
         <label class="text-xs text-gray-500 w-14 flex-shrink-0">Model</label>
         <select
@@ -34,7 +31,6 @@
         </select>
         <span class="h-2 w-2 rounded-full flex-shrink-0" :class="`bg-${store.currentProvider.color}-400`"></span>
       </div>
-
     </div>
 
     <!-- Drop zone -->
@@ -58,7 +54,7 @@
             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
         </svg>
         <p class="text-sm font-medium text-gray-600">
-          Drag & drop a PDF here, or <span class="text-indigo-600 underline">browse</span>
+          Drop a Loss Run PDF here, or <span class="text-indigo-600 underline">browse</span>
         </p>
         <p class="mt-1 text-xs text-gray-400">PDF files only · up to 50 MB</p>
       </div>
@@ -75,23 +71,9 @@
       </div>
     </div>
 
-    <!-- Options row -->
-    <div class="grid grid-cols-2 gap-3">
-      <div>
-        <label class="block text-xs font-medium text-gray-500 mb-1">Document type (optional)</label>
-        <select
-          v-model="docType"
-          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        >
-          <option value="">Auto-detect</option>
-          <option value="invoice">Invoice</option>
-          <option value="contract">Contract</option>
-          <option value="resume">Resume</option>
-          <option value="report">Report</option>
-          <option value="form">Form</option>
-        </select>
-      </div>
-      <div>
+    <!-- User ID + doc type badge row -->
+    <div class="flex items-center gap-3">
+      <div class="flex-1">
         <label class="block text-xs font-medium text-gray-500 mb-1">User ID (optional)</label>
         <input
           v-model="userId"
@@ -99,6 +81,14 @@
           placeholder="e.g. user_123"
           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
         />
+      </div>
+      <div class="flex-shrink-0 mt-5">
+        <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-700">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+          </svg>
+          Loss Run
+        </span>
       </div>
     </div>
 
@@ -113,7 +103,7 @@
       <span v-else-if="store.status === 'streaming'">
         Extracting with {{ { llamaparse: 'LlamaParse', liteparse: 'LiteParse' }[store.activeProvider] || store.activeProvider?.toUpperCase() }}…
       </span>
-      <span v-else>Extract PDF</span>
+      <span v-else>Extract Loss Run</span>
     </button>
 
     <!-- Progress feed -->
@@ -136,7 +126,6 @@ import { useExtractionStore } from '../stores/extraction.js'
 const store    = useExtractionStore()
 const fileInput = ref(null)
 const selectedFile = ref(null)
-const docType  = ref('')
 const userId   = ref('')
 const isDragging = ref(false)
 
@@ -167,7 +156,7 @@ async function submit() {
   if (!canSubmit.value) return
   await store.uploadPdf(selectedFile.value, {
     userId: userId.value || null,
-    docType: docType.value || null,
+    docType: 'lossrun',
   })
 }
 

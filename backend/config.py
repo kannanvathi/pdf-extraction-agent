@@ -5,7 +5,7 @@ from typing import Literal
 
 class Settings(BaseSettings):
     # ── Active provider ──────────────────────────────────────────────────
-    active_provider: Literal["openai", "gemini", "anthropic", "llamaparse", "liteparse"] = "llamaparse"
+    active_provider: Literal["openai", "gemini", "anthropic", "llamaparse", "liteparse"] = "openai"
 
     # ── API keys (fill whichever providers you want to use) ──────────────
     openai_api_key: str = ""

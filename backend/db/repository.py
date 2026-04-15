@@ -150,6 +150,8 @@ class ExtractionRepository:
             "table_data": 0,
             "entities": 0,
             "fields": 0,
+            "claims": 0,          # heavy — use /extractions/{id} for full detail
+            "policy_periods": 0,  # heavy — use /extractions/{id} for full detail
         }
         cursor = (
             self._col.find({}, projection)

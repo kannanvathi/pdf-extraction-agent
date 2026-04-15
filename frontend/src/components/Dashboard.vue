@@ -4,21 +4,38 @@
     <!-- ── Left: Document List ──────────────────────────────────────────── -->
     <aside class="w-80 flex-shrink-0 flex flex-col border-r border-gray-200 bg-white">
 
-      <!-- header -->
-      <div class="px-4 py-3 border-b border-gray-200 flex items-center gap-2">
-        <span class="text-sm font-semibold text-gray-700 flex-1">Documents</span>
-        <span class="text-xs text-gray-400 tabular-nums">{{ docs.length }}</span>
-        <button
-          class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
-          :class="{ 'animate-spin': loading }"
-          title="Refresh"
-          @click="loadDocuments"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-        </button>
+      <!-- header + portfolio KPIs -->
+      <div class="px-4 py-3 border-b border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-sm font-semibold text-gray-700 flex-1">Loss Run Portfolio</span>
+          <span class="text-xs text-gray-400 tabular-nums">{{ docs.length }}</span>
+          <button
+            class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+            :class="{ 'animate-spin': loading }"
+            title="Refresh"
+            @click="loadDocuments"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </button>
+        </div>
+        <!-- Portfolio totals strip -->
+        <div class="grid grid-cols-3 gap-1 text-center">
+          <div class="rounded-lg bg-gray-50 py-1.5">
+            <p class="text-base font-bold text-gray-800">{{ portfolioKpis.totalClaims }}</p>
+            <p class="text-[0.6rem] text-gray-400 uppercase">Claims</p>
+          </div>
+          <div class="rounded-lg bg-red-50 py-1.5">
+            <p class="text-base font-bold text-red-600">{{ portfolioKpis.openClaims }}</p>
+            <p class="text-[0.6rem] text-red-400 uppercase">Open</p>
+          </div>
+          <div class="rounded-lg bg-indigo-50 py-1.5">
+            <p class="text-base font-bold text-indigo-700">{{ fmtMoneyShort(portfolioKpis.totalIncurred) }}</p>
+            <p class="text-[0.6rem] text-indigo-400 uppercase">Incurred</p>
+          </div>
+        </div>
       </div>
 
       <!-- search -->
@@ -26,7 +43,7 @@
         <input
           v-model="search"
           type="text"
-          placeholder="Search by name or ID…"
+          placeholder="Search by insured, file, or ID…"
           class="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
         />
       </div>
@@ -49,7 +66,6 @@
             : 'hover:bg-gray-50 border-l-4 border-l-transparent'"
           @click="selectDoc(doc)"
         >
-          <!-- lr_doc_id badge -->
           <div class="flex items-center gap-2 mb-1">
             <span class="text-[0.65rem] font-mono font-semibold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">
               {{ doc.lr_doc_id }}
@@ -62,19 +78,13 @@
               {{ providerLabel(doc.provider || doc.parser) }}
             </span>
           </div>
-
-          <!-- filename -->
           <p class="text-xs font-medium text-gray-800 truncate leading-snug">
             {{ displayName(doc.file_name) }}
           </p>
-
-          <!-- meta row -->
           <div class="flex items-center gap-2 mt-1 text-[0.65rem] text-gray-400">
             <span>{{ formatDate(doc.created_at) }}</span>
             <span v-if="doc.page_count" class="text-gray-300">·</span>
             <span v-if="doc.page_count">{{ doc.page_count }}p</span>
-            <span v-if="doc.doc_type && doc.doc_type !== 'unknown'" class="text-gray-300">·</span>
-            <span v-if="doc.doc_type && doc.doc_type !== 'unknown'" class="capitalize">{{ doc.doc_type }}</span>
           </div>
         </button>
       </div>
@@ -84,23 +94,22 @@
     <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
 
       <!-- empty state -->
-      <div
-        v-if="!activeDoc"
-        class="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3"
-      >
+      <div v-if="!activeDoc" class="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3">
         <svg class="w-12 h-12 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/>
         </svg>
-        <p class="text-sm">Select a document to view details</p>
+        <p class="text-sm">Select a loss run to view details</p>
       </div>
 
       <template v-else>
+
         <!-- doc header -->
         <div class="px-6 py-3 bg-white border-b border-gray-200 flex items-center gap-3 flex-shrink-0">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-0.5">
               <span class="text-xs font-mono font-semibold text-indigo-600">{{ activeDoc.lr_doc_id }}</span>
+              <span class="text-[0.65rem] px-2 py-0.5 rounded-full font-semibold bg-amber-100 text-amber-700">Loss Run</span>
               <span
                 v-if="activeDoc.provider || activeDoc.parser"
                 class="text-[0.6rem] font-medium px-1.5 py-0.5 rounded"
@@ -113,17 +122,44 @@
           </div>
           <div class="flex-shrink-0 text-right text-xs text-gray-400">
             <div>{{ formatDate(activeDoc.created_at) }}</div>
-            <div v-if="activeDoc.page_count">{{ activeDoc.page_count }} page{{ activeDoc.page_count !== 1 ? 's' : '' }}</div>
+            <div v-if="activeDoc.page_count">{{ activeDoc.page_count }}p</div>
           </div>
           <button
             class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700"
-            title="Close"
-            @click="activeDoc = null; activePdfUrl = null"
+            @click="activeDoc = null; activePdfUrl = null; fullDoc = null"
           >✕</button>
         </div>
 
+        <!-- KPI strip for selected doc -->
+        <div v-if="docSummary" class="px-6 py-3 bg-white border-b border-gray-200 grid grid-cols-6 gap-3 flex-shrink-0">
+          <div class="text-center">
+            <p class="text-lg font-bold text-gray-800">{{ docSummary.total_claims ?? '—' }}</p>
+            <p class="text-[0.65rem] text-gray-400">Total Claims</p>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-red-600">{{ docSummary.open_claims ?? '—' }}</p>
+            <p class="text-[0.65rem] text-red-400">Open</p>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-green-600">{{ docSummary.closed_claims ?? '—' }}</p>
+            <p class="text-[0.65rem] text-green-500">Closed</p>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-gray-700">{{ fmtMoneyShort(docSummary.total_paid) }}</p>
+            <p class="text-[0.65rem] text-gray-400">Paid</p>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-orange-600">{{ fmtMoneyShort(docSummary.total_reserve) }}</p>
+            <p class="text-[0.65rem] text-orange-400">Reserve</p>
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-bold text-indigo-700">{{ fmtMoneyShort(docSummary.total_incurred) }}</p>
+            <p class="text-[0.65rem] text-indigo-400">Incurred</p>
+          </div>
+        </div>
+
         <!-- tabs -->
-        <div class="px-6 pt-0 bg-white border-b border-gray-200 flex gap-0 flex-shrink-0">
+        <div class="px-6 bg-white border-b border-gray-200 flex gap-0 flex-shrink-0">
           <button
             v-for="t in detailTabs"
             :key="t.id"
@@ -138,11 +174,116 @@
         <!-- tab content -->
         <div class="flex-1 overflow-auto">
 
-          <!-- ── PDF View ─────────────────────────────────────────────── -->
+          <!-- ── Policy + Claims ──────────────────────────────────────── -->
+          <div v-show="detailTab === 'claims'" class="p-6 space-y-5">
+            <div v-if="!fullDoc" class="text-gray-400 text-sm text-center py-12">Loading…</div>
+            <template v-else>
+
+              <!-- Policy info -->
+              <div v-if="policyInfoFields.length" class="rounded-xl border border-gray-200 bg-white p-4">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Policy Information</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2">
+                  <div v-for="[k, v] in policyInfoFields" :key="k">
+                    <p class="text-[0.65rem] font-medium text-gray-400 uppercase">{{ humanize(k) }}</p>
+                    <p class="text-sm text-gray-800 font-medium">{{ v || '—' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Policy periods -->
+              <div v-if="fullDoc.policy_periods?.length" class="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                  <span class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Policy Periods</span>
+                  <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">
+                    {{ fullDoc.policy_periods.length }}
+                  </span>
+                </div>
+                <div class="divide-y divide-gray-100">
+                  <div
+                    v-for="(period, i) in fullDoc.policy_periods"
+                    :key="i"
+                    class="px-4 py-3 flex flex-wrap gap-4 items-center text-sm"
+                  >
+                    <div class="w-36">
+                      <p class="text-xs text-gray-400">Period</p>
+                      <p class="font-medium text-gray-800 text-xs">{{ period.period_start || '?' }} → {{ period.period_end || '?' }}</p>
+                    </div>
+                    <div v-if="period.policy_number" class="w-32">
+                      <p class="text-xs text-gray-400">Policy #</p>
+                      <p class="font-mono text-xs text-gray-700">{{ period.policy_number }}</p>
+                    </div>
+                    <div class="flex gap-4 ml-auto text-right">
+                      <div>
+                        <p class="text-xs text-gray-400">Claims</p>
+                        <p class="font-semibold text-gray-800">{{ period.total_claims ?? '—' }}
+                          <span v-if="period.open_claims" class="text-red-500 text-xs">({{ period.open_claims }} open)</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-400">Incurred</p>
+                        <p class="font-semibold text-indigo-700">{{ fmtMoney(period.total_incurred) }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Claims table -->
+              <div v-if="fullDoc.claims?.length" class="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                  <span class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Claims</span>
+                  <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
+                    {{ fullDoc.claims.length }}
+                  </span>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-xs">
+                    <thead>
+                      <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="px-3 py-2 text-left font-semibold text-gray-500 whitespace-nowrap">Claim #</th>
+                        <th class="px-3 py-2 text-left font-semibold text-gray-500 whitespace-nowrap">Date of Loss</th>
+                        <th class="px-3 py-2 text-left font-semibold text-gray-500">Claimant</th>
+                        <th class="px-3 py-2 text-left font-semibold text-gray-500">Type</th>
+                        <th class="px-3 py-2 text-left font-semibold text-gray-500">Status</th>
+                        <th class="px-3 py-2 text-right font-semibold text-gray-500 whitespace-nowrap">Total Paid</th>
+                        <th class="px-3 py-2 text-right font-semibold text-gray-500 whitespace-nowrap">Reserve</th>
+                        <th class="px-3 py-2 text-right font-semibold text-gray-500 whitespace-nowrap">Total Incurred</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(claim, i) in fullDoc.claims"
+                        :key="i"
+                        class="border-b last:border-0 hover:bg-gray-50"
+                      >
+                        <td class="px-3 py-2 font-mono text-gray-700">{{ claim.claim_number || '—' }}</td>
+                        <td class="px-3 py-2 text-gray-600 whitespace-nowrap">{{ claim.date_of_loss || '—' }}</td>
+                        <td class="px-3 py-2 text-gray-700 max-w-[140px] truncate">{{ claim.claimant_name || '—' }}</td>
+                        <td class="px-3 py-2 text-gray-600 max-w-[120px] truncate">{{ claim.type_of_loss || '—' }}</td>
+                        <td class="px-3 py-2">
+                          <span class="inline-block px-2 py-0.5 rounded-full text-[0.6rem] font-semibold" :class="statusClass(claim.status)">
+                            {{ claim.status || '—' }}
+                          </span>
+                        </td>
+                        <td class="px-3 py-2 text-right font-mono text-gray-700">{{ fmtMoney(claim.total_paid) }}</td>
+                        <td class="px-3 py-2 text-right font-mono text-orange-600">{{ fmtMoney(claim.outstanding_reserve) }}</td>
+                        <td class="px-3 py-2 text-right font-mono font-semibold text-indigo-700">{{ fmtMoney(claim.total_incurred) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div v-if="!policyInfoFields.length && !fullDoc.claims?.length && !fullDoc.policy_periods?.length"
+                   class="text-center py-12 text-gray-400 text-sm">
+                No structured loss run data extracted — try with an AI provider (OpenAI / Anthropic / Gemini).
+              </div>
+            </template>
+          </div>
+
+          <!-- ── PDF View ──────────────────────────────────────────────── -->
           <div v-show="detailTab === 'pdf'" class="p-6">
-            <div v-if="pdfLoading" class="flex items-center justify-center h-48 text-gray-400 text-sm">
-              Loading PDF…
-            </div>
+            <div v-if="pdfLoading" class="flex items-center justify-center h-48 text-gray-400 text-sm">Loading PDF…</div>
             <div v-else-if="pdfError" class="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
               {{ pdfError }}
             </div>
@@ -154,25 +295,20 @@
             />
           </div>
 
-          <!-- ── Tables ───────────────────────────────────────────────── -->
+          <!-- ── Raw Tables ────────────────────────────────────────────── -->
           <div v-show="detailTab === 'tables'" class="p-6">
             <div v-if="!fullDoc" class="text-gray-400 text-sm text-center py-12">Loading…</div>
-            <div v-else-if="!fullDoc.table_data?.length"
-                 class="text-gray-400 text-sm text-center py-12">
-              No tables extracted from this document.
+            <div v-else-if="!fullDoc.table_data?.length" class="text-gray-400 text-sm text-center py-12">
+              No raw tables extracted.
             </div>
             <template v-else>
               <div class="flex items-center gap-3 mb-4">
-                <h3 class="text-sm font-semibold text-gray-700">Extracted Tables</h3>
+                <h3 class="text-sm font-semibold text-gray-700">Raw Extracted Tables</h3>
                 <span class="text-xs font-medium bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">
-                  {{ fullDoc.table_data.length }} table{{ fullDoc.table_data.length !== 1 ? 's' : '' }}
+                  {{ fullDoc.table_data.length }}
                 </span>
               </div>
-              <div
-                v-for="table in fullDoc.table_data"
-                :key="table.name"
-                class="mb-6 rounded-xl border border-gray-200 overflow-hidden bg-white"
-              >
+              <div v-for="table in fullDoc.table_data" :key="table.name" class="mb-6 rounded-xl border border-gray-200 overflow-hidden bg-white">
                 <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-200">
                   <span class="text-xs font-semibold text-gray-600 uppercase tracking-wide">{{ table.name }}</span>
                   <span class="text-xs text-gray-400">{{ table.rows?.length }} rows</span>
@@ -215,35 +351,62 @@
         </div>
       </template>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import PdfViewer from './PdfViewer.vue'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
 
+const POLICY_DISPLAY_KEYS = [
+  'insured_name', 'policy_number', 'line_of_business', 'insurer_name',
+  'policy_period_start', 'policy_period_end', 'producer_name', 'report_date', 'state',
+]
+
 // ── State ──────────────────────────────────────────────────────────────────
-const docs       = ref([])
-const loading    = ref(false)
-const search     = ref('')
-
-const activeDoc  = ref(null)   // light doc from list (no heavy fields)
-const fullDoc    = ref(null)   // full doc including pages, table_data, etc.
+const docs         = ref([])
+const loading      = ref(false)
+const search       = ref('')
+const activeDoc    = ref(null)
+const fullDoc      = ref(null)
 const activePdfUrl = ref(null)
-const pdfLoading = ref(false)
-const pdfError   = ref(null)
-
-const detailTab  = ref('pdf')
-const copied     = ref(false)
+const pdfLoading   = ref(false)
+const pdfError     = ref(null)
+const detailTab    = ref('claims')
+const copied       = ref(false)
 
 const detailTabs = [
-  { id: 'pdf',    label: 'PDF View' },
-  { id: 'tables', label: 'Tables'   },
-  { id: 'json',   label: 'JSON'     },
+  { id: 'claims', label: 'Policy & Claims' },
+  { id: 'pdf',    label: 'PDF View'        },
+  { id: 'tables', label: 'Raw Tables'      },
+  { id: 'json',   label: 'JSON'            },
 ]
+
+// ── Portfolio KPIs (computed across all docs in list) ─────────────────────
+const portfolioKpis = computed(() => {
+  return docs.value.reduce((acc, doc) => {
+    const s = doc.summary || {}
+    acc.totalClaims   += s.total_claims   ?? 0
+    acc.openClaims    += s.open_claims    ?? 0
+    acc.totalIncurred += s.total_incurred ?? 0
+    return acc
+  }, { totalClaims: 0, openClaims: 0, totalIncurred: 0 })
+})
+
+// ── Active doc derived state ───────────────────────────────────────────────
+const docSummary = computed(() => {
+  if (!fullDoc.value?.summary) return null
+  const s = fullDoc.value.summary
+  if (Object.keys(s).length === 0) return null
+  return s
+})
+
+const policyInfoFields = computed(() => {
+  const info = fullDoc.value?.policy_info || {}
+  return POLICY_DISPLAY_KEYS.filter(k => info[k] != null).map(k => [k, info[k]])
+})
 
 // ── Filtered list ──────────────────────────────────────────────────────────
 const filteredDocs = computed(() => {
@@ -252,7 +415,7 @@ const filteredDocs = computed(() => {
   return docs.value.filter(d =>
     d.lr_doc_id?.toLowerCase().includes(q) ||
     d.file_name?.toLowerCase().includes(q) ||
-    d.doc_type?.toLowerCase().includes(q) ||
+    d.policy_info?.insured_name?.toLowerCase().includes(q) ||
     d.provider?.toLowerCase().includes(q)
   )
 })
@@ -273,18 +436,16 @@ async function loadDocuments() {
 
 // ── Select document ────────────────────────────────────────────────────────
 async function selectDoc(doc) {
-  activeDoc.value  = doc
-  fullDoc.value    = null
+  activeDoc.value    = doc
+  fullDoc.value      = null
   activePdfUrl.value = null
-  pdfError.value   = null
-  detailTab.value  = 'pdf'
+  pdfError.value     = null
+  detailTab.value    = 'claims'
 
-  // Fetch full document (with pages, table_data, etc.) in parallel with PDF
   const [fullResult, pdfResult] = await Promise.allSettled([
     fetchFullDoc(doc._id),
     fetchPdf(doc._id),
   ])
-
   if (fullResult.status === 'fulfilled') fullDoc.value = fullResult.value
   if (pdfResult.status === 'fulfilled')  activePdfUrl.value = pdfResult.value
   else pdfError.value = pdfResult.reason?.message ?? 'PDF file not available on server.'
@@ -320,14 +481,13 @@ const highlightedJson = computed(() => {
     .replace(
       /("(\\u[\dA-Fa-f]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
       match => {
-        if (/^"/.test(match)) {
+        if (/^"/.test(match))
           return /:$/.test(match)
-            ? `<span style="color:#fbbf24">${match}</span>`   // key  → amber
-            : `<span style="color:#86efac">${match}</span>`   // str  → green
-        }
-        if (/true|false/.test(match)) return `<span style="color:#c084fc">${match}</span>`  // bool → purple
-        if (/null/.test(match))       return `<span style="color:#f87171">${match}</span>`  // null → red
-        return `<span style="color:#93c5fd">${match}</span>`  // num  → blue
+            ? `<span style="color:#fbbf24">${match}</span>`
+            : `<span style="color:#86efac">${match}</span>`
+        if (/true|false/.test(match)) return `<span style="color:#c084fc">${match}</span>`
+        if (/null/.test(match))       return `<span style="color:#f87171">${match}</span>`
+        return `<span style="color:#93c5fd">${match}</span>`
       }
     )
 })
@@ -351,18 +511,40 @@ function buildColumns(table) {
   }))
 }
 
-// ── Display helpers ────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────
 function displayName(filename) {
   if (!filename) return 'Unknown'
-  // Strip UUID job-id prefix: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx_
   return filename.replace(/^[\da-f-]{36}_/i, '')
 }
 
 function formatDate(iso) {
   if (!iso) return '—'
   const d = new Date(iso)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
-    ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function humanize(key) {
+  return String(key).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function fmtMoney(val) {
+  if (val == null) return '—'
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val)
+}
+
+function fmtMoneyShort(val) {
+  if (val == null || val === 0) return '—'
+  if (Math.abs(val) >= 1_000_000) return `$${(val / 1_000_000).toFixed(1)}M`
+  if (Math.abs(val) >= 1_000)     return `$${(val / 1_000).toFixed(0)}K`
+  return `$${val}`
+}
+
+function statusClass(status) {
+  const s = (status || '').toLowerCase()
+  if (s === 'open')     return 'bg-red-100 text-red-700'
+  if (s === 'closed')   return 'bg-green-100 text-green-700'
+  if (s === 'reopened') return 'bg-yellow-100 text-yellow-700'
+  return 'bg-gray-100 text-gray-600'
 }
 
 function providerLabel(raw) {
@@ -385,18 +567,9 @@ function providerBadgeClass(raw) {
   }[id] ?? 'bg-gray-100 text-gray-600'
 }
 
-// Cleanup blob URLs on unmount / doc change
-watch(activeDoc, (newDoc, oldDoc) => {
-  if (oldDoc && activePdfUrl.value) {
-    // URL.revokeObjectURL handled when a new fetchPdf runs
-  }
-})
-
 onMounted(loadDocuments)
 </script>
 
 <style scoped>
-aside {
-  min-height: 0;
-}
+aside { min-height: 0; }
 </style>
