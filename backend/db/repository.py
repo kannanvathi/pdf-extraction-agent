@@ -92,6 +92,21 @@ class ExtractionRepository:
             "created_at": datetime.now(timezone.utc),
             **envelope,
         })
+        
+        # Estimate BSON size to catch docs that would exceed MongoDB's 16 MB limit
+        from bson import encode
+        try:
+            bson_size = len(encode(doc))
+            if bson_size > 14_000_000:  # Leave 2 MB safety margin
+                log.warning(
+                    "Document %s is %.1f MB (approaching 16 MB BSON limit). "
+                    "Consider reducing full_text or pages data.",
+                    lr_doc_id,
+                    bson_size / 1_000_000,
+                )
+        except Exception as e:
+            log.error("Failed to estimate BSON size for %s: %s", lr_doc_id, e)
+        
         result = await self._col.insert_one(doc)
         return str(result.inserted_id)
 
@@ -241,17 +256,34 @@ def _sha256(file_path: str) -> str:
     return h.hexdigest()
 
 
-def _sanitize(obj: Any) -> Any:
+def _sanitize(obj: Any, max_field_size: int = 1_000_000) -> Any:
     """
-    Recursively strip NULL bytes (\\x00) from all string keys and values.
-    MongoDB rejects documents whose key names contain the NULL byte.
+    Recursively:
+    1. Strip NULL bytes (\\x00) from all string keys and values.
+    2. Truncate large string fields to prevent BSON size limit (16 MB) errors.
+    
+    Args:
+        obj: The object to sanitize
+        max_field_size: Max bytes per string field (default 1 MB)
     """
     if isinstance(obj, dict):
-        return {k.replace("\x00", ""): _sanitize(v) for k, v in obj.items()}
+        sanitized = {}
+        for k, v in obj.items():
+            key = k.replace("\x00", "")
+            sanitized[key] = _sanitize(v, max_field_size)
+        return sanitized
     if isinstance(obj, list):
-        return [_sanitize(item) for item in obj]
+        return [_sanitize(item, max_field_size) for item in obj]
     if isinstance(obj, str):
-        return obj.replace("\x00", "")
+        cleaned = obj.replace("\x00", "")
+        if len(cleaned) > max_field_size:
+            log.warning(
+                "Truncating string field from %d to %d bytes",
+                len(cleaned),
+                max_field_size,
+            )
+            return cleaned[:max_field_size]
+        return cleaned
     return obj
 
 
