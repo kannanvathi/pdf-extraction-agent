@@ -24,6 +24,7 @@ frontend/dist/
 frontend/.vite/
 *.log
 npm-debug.log*
+frontend/package-lock.json
 
 # ── Runtime artefacts ────────────────────────────────────────────────────────
 eng.traineddata
