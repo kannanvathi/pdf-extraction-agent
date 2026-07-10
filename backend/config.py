@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     llama_cloud_api_key: str = ""
 
     # ── Infrastructure ───────────────────────────────────────────────────
-    mongodb_url: str = "mongodb://localhost:27017"
+    mongodb_url: str = "mongodb+srv://kannanvathi:Athira123@cluster1.qobvrwa.mongodb.net/expenses_db?retryWrites=true&w=majority"
     mongodb_db: str = "pdf_agent"
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str = "redis://localhost:6379/0"
