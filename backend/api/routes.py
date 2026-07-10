@@ -33,7 +33,10 @@ _job_queues: dict[str, asyncio.Queue] = {}
 # ---------------------------------------------------------------------------
 
 def get_repo(request: Request) -> ExtractionRepository:
-    return request.app.state.repo
+    repo = getattr(request.app.state, "repo", None)
+    if repo is None:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+    return repo
 
 
 # ---------------------------------------------------------------------------

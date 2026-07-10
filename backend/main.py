@@ -21,7 +21,13 @@ from backend.db.repository import close_db, connect_db
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: connect MongoDB and cache repo on app state
-    app.state.repo = await connect_db()
+    try:
+        app.state.repo = await connect_db()
+        app.state.db_status = "connected"
+    except Exception as exc:  # pragma: no cover - defensive for deployment
+        app.state.repo = None
+        app.state.db_status = "disconnected"
+        app.state.db_error = str(exc)
     yield
     # Shutdown: close MongoDB client
     await close_db()
@@ -41,6 +47,14 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.get("/")
+    async def root() -> dict[str, str]:
+        return {
+            "status": "ok",
+            "database": getattr(app.state, "db_status", "unknown"),
+        }
+
     app.include_router(router, prefix="/api/v1")
     return app
 
