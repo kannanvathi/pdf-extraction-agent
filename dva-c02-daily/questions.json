@@ -1,0 +1,392 @@
+[
+  {
+    "id": 1,
+    "domain": "Development with AWS Services",
+    "question": "Which AWS service allows you to run code without provisioning or managing servers?",
+    "options": {
+      "A": "Amazon EC2",
+      "B": "AWS Lambda",
+      "C": "Amazon ECS",
+      "D": "AWS Elastic Beanstalk"
+    },
+    "answer": "B",
+    "explanation": "AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers. You upload your code and Lambda takes care of everything required to run and scale it."
+  },
+  {
+    "id": 2,
+    "domain": "Deployment",
+    "question": "Which AWS service provides fully managed continuous integration and continuous delivery (CI/CD) service?",
+    "options": {
+      "A": "AWS CodePipeline",
+      "B": "AWS CodeBuild",
+      "C": "AWS CodeDeploy",
+      "D": "AWS CodeCommit"
+    },
+    "answer": "A",
+    "explanation": "AWS CodePipeline is a fully managed continuous delivery service that helps you automate your release pipelines for fast and reliable application and infrastructure updates."
+  },
+  {
+    "id": 3,
+    "domain": "Security",
+    "question": "Which IAM policy element specifies the actions that are allowed or denied?",
+    "options": {
+      "A": "Resource",
+      "B": "Effect",
+      "C": "Action",
+      "D": "Principal"
+    },
+    "answer": "C",
+    "explanation": "The Action element in an IAM policy specifies the AWS service actions (e.g., s3:GetObject, ec2:StartInstances) that are allowed or denied when the policy is applied."
+  },
+  {
+    "id": 4,
+    "domain": "Troubleshooting and Optimization",
+    "question": "Which AWS service provides visibility into application performance by tracing requests across microservices?",
+    "options": {
+      "A": "Amazon CloudWatch",
+      "B": "AWS X-Ray",
+      "C": "AWS CloudTrail",
+      "D": "Amazon Inspector"
+    },
+    "answer": "B",
+    "explanation": "AWS X-Ray helps developers analyze and debug distributed applications by providing end-to-end tracing of requests as they travel through the application."
+  },
+  {
+    "id": 5,
+    "domain": "Development with AWS Services",
+    "question": "Which DynamoDB feature automatically duplicates a table across multiple AWS Regions?",
+    "options": {
+      "A": "Global Secondary Index",
+      "B": "DynamoDB Accelerator (DAX)",
+      "C": "Global Tables",
+      "D": "Point-in-Time Recovery"
+    },
+    "answer": "C",
+    "explanation": "DynamoDB Global Tables provide a fully managed, multi-region, multi-active database that delivers fast, local read and write performance for massively scaled global applications."
+  },
+  {
+    "id": 6,
+    "domain": "Deployment",
+    "question": "In AWS CodeDeploy, which file format is used to specify the source files, scripts, and deployment actions?",
+    "options": {
+      "A": "buildspec.yml",
+      "B": "appspec.yml",
+      "C": "taskdef.json",
+      "D": "Dockerrun.aws.json"
+    },
+    "answer": "B",
+    "explanation": "The appspec.yml file is used by AWS CodeDeploy to define the files to be deployed and the scripts to run during the deployment lifecycle hooks."
+  },
+  {
+    "id": 7,
+    "domain": "Development with AWS Services",
+    "question": "Which Amazon SQS message attribute type should you use to send structured metadata like timestamps and counts?",
+    "options": {
+      "A": "String",
+      "B": "Binary",
+      "C": "Number",
+      "D": "All of the above"
+    },
+    "answer": "D",
+    "explanation": "SQS supports String, Number, and Binary as message attribute data types. You can use these to send structured metadata alongside your message body."
+  },
+  {
+    "id": 8,
+    "domain": "Security",
+    "question": "Which AWS service should you use to securely store and regularly rotate encryption keys?",
+    "options": {
+      "A": "AWS Secrets Manager",
+      "B": "AWS Certificate Manager",
+      "C": "AWS Key Management Service (KMS)",
+      "D": "AWS Identity and Access Management"
+    },
+    "answer": "C",
+    "explanation": "AWS KMS makes it easy to create and manage cryptographic keys used to protect your data. It supports automatic key rotation on a yearly schedule."
+  },
+  {
+    "id": 9,
+    "domain": "Troubleshooting and Optimization",
+    "question": "A Lambda function is timing out consistently. What should you check FIRST?",
+    "options": {
+      "A": "Increase the memory allocation",
+      "B": "Check for infinite loops or blocked network calls",
+      "C": "Increase the timeout limit",
+      "D": "Enable provisioned concurrency"
+    },
+    "answer": "B",
+    "explanation": "Before increasing resources, investigate the root cause. Timeout issues are most commonly caused by infinite loops, blocked network calls to unreachable endpoints, or inefficient code."
+  },
+  {
+    "id": 10,
+    "domain": "Development with AWS Services",
+    "question": "Which API Gateway integration type allows you to connect to any HTTPS endpoint?",
+    "options": {
+      "A": "AWS",
+      "B": "HTTP",
+      "C": "Lambda",
+      "D": "Mock"
+    },
+    "answer": "B",
+    "explanation": "The HTTP integration type allows API Gateway to connect to any HTTP endpoint, including third-party APIs, on-premises services, or other AWS services."
+  },
+  {
+    "id": 11,
+    "domain": "Deployment",
+    "question": "Which AWS service provides a fully managed artifact repository for storing, publishing, and sharing software packages?",
+    "options": {
+      "A": "AWS CodeCommit",
+      "B": "AWS CodeArtifact",
+      "C": "Amazon S3",
+      "D": "AWS CloudFormation"
+    },
+    "answer": "B",
+    "explanation": "AWS CodeArtifact is a fully managed artifact repository that makes it easy for organizations of any size to securely store, publish, and share software packages."
+  },
+  {
+    "id": 12,
+    "domain": "Security",
+    "question": "What is the maximum duration for an IAM role session token when using AWS STS AssumeRole?",
+    "options": {
+      "A": "1 hour",
+      "B": "6 hours",
+      "C": "12 hours",
+      "D": "36 hours"
+    },
+    "answer": "C",
+    "explanation": "The maximum duration for temporary credentials from AssumeRole is 12 hours. The default is 1 hour, but you can set it between 15 minutes and 12 hours."
+  },
+  {
+    "id": 13,
+    "domain": "Development with AWS Services",
+    "question": "Which DynamoDB operation is most cost-effective for retrieving multiple items with different primary keys?",
+    "options": {
+      "A": "GetItem",
+      "B": "Query",
+      "C": "BatchGetItem",
+      "D": "Scan"
+    },
+    "answer": "C",
+    "explanation": "BatchGetItem allows you to retrieve multiple items from one or more tables in a single request, reducing the number of API calls and being more cost-effective."
+  },
+  {
+    "id": 14,
+    "domain": "Troubleshooting and Optimization",
+    "question": "Which CloudWatch metric should you monitor to detect Lambda cold start issues?",
+    "options": {
+      "A": "Invocations",
+      "B": "Duration",
+      "C": "Init Duration",
+      "D": "Errors"
+    },
+    "answer": "C",
+    "explanation": "The Init Duration metric in CloudWatch shows the time taken for a cold start. High init durations indicate cold start issues that can be mitigated with provisioned concurrency."
+  },
+  {
+    "id": 15,
+    "domain": "Deployment",
+    "question": "Which CodeDeploy deployment type replaces all instances simultaneously?",
+    "options": {
+      "A": "In-place",
+      "B": "Blue/Green",
+      "C": "Rolling",
+      "D": "Canary"
+    },
+    "answer": "B",
+    "explanation": "Blue/Green deployment creates an identical replacement environment and shifts traffic from the original to the replacement. It replaces all instances at once after validation."
+  },
+  {
+    "id": 16,
+    "domain": "Development with AWS Services",
+    "question": "Which S3 storage class is most cost-effective for data accessed once per quarter with retrieval within 12 hours?",
+    "options": {
+      "A": "S3 Standard",
+      "B": "S3 Standard-IA",
+      "C": "S3 Glacier Instant Retrieval",
+      "D": "S3 Glacier Deep Archive"
+    },
+    "answer": "C",
+    "explanation": "S3 Glacier Instant Retrieval is designed for data accessed once per quarter with millisecond retrieval. It offers the lowest storage cost for infrequently accessed data with instant access."
+  },
+  {
+    "id": 17,
+    "domain": "Security",
+    "question": "Which AWS service helps you identify unencrypted EBS volumes across your accounts?",
+    "options": {
+      "A": "AWS Config",
+      "B": "AWS Security Hub",
+      "C": "Amazon Macie",
+      "D": "Both A and B"
+    },
+    "answer": "D",
+    "explanation": "AWS Config can check if EBS volumes are encrypted using managed rules, and Security Hub aggregates findings including compliance checks for encryption across accounts."
+  },
+  {
+    "id": 18,
+    "domain": "Development with AWS Services",
+    "question": "What is the maximum size of an SQS message after Base64 encoding?",
+    "options": {
+      "A": "256 KB",
+      "B": "512 KB",
+      "C": "1 MB",
+      "D": "2 MB"
+    },
+    "answer": "A",
+    "explanation": "The maximum SQS message size is 256 KB after Base64 encoding. For larger messages, use the SQS Extended Client Library to store the payload in S3."
+  },
+  {
+    "id": 19,
+    "domain": "Troubleshooting and Optimization",
+    "question": "A DynamoDB table is experiencing throttling on write operations. Which solutions are valid? (Choose TWO)",
+    "options": {
+      "A": "Increase table capacity mode to On-Demand",
+      "B": "Add a Global Secondary Index",
+      "C": "Use DAX for caching",
+      "D": "Implement exponential backoff in the application"
+    },
+    "answer": "A, D",
+    "explanation": "Switching to On-Demand capacity eliminates throttling by automatically scaling. Implementing exponential backoff helps the application handle throttling gracefully."
+  },
+  {
+    "id": 20,
+    "domain": "Deployment",
+    "question": "Which AWS service provides a managed Docker container registry?",
+    "options": {
+      "A": "AWS EBS",
+      "B": "Amazon ECR",
+      "C": "AWS ECS",
+      "D": "AWS EKS"
+    },
+    "answer": "B",
+    "explanation": "Amazon Elastic Container Registry (ECR) is a managed Docker container registry that makes it easy to store, manage, and deploy Docker container images."
+  },
+  {
+    "id": 21,
+    "domain": "Development with AWS Services",
+    "question": "Which Lambda trigger type is used to process S3 event notifications?",
+    "options": {
+      "A": "CloudWatch Events",
+      "B": "S3 Notification Configuration",
+      "C": "API Gateway",
+      "D": "SQS"
+    },
+    "answer": "B",
+    "explanation": "S3 can send event notifications to Lambda by configuring the bucket's notification configuration. This triggers the Lambda function when objects are created, deleted, etc."
+  },
+  {
+    "id": 22,
+    "domain": "Security",
+    "question": "Which principle should you follow when configuring IAM permissions for a Lambda function?",
+    "options": {
+      "A": "Grant full access for simplicity",
+      "B": "Use the same role for all functions",
+      "C": "Apply least privilege principle",
+      "D": "Store credentials in environment variables"
+    },
+    "answer": "C",
+    "explanation": "The principle of least privilege means granting only the minimum permissions needed for the function to perform its task. This reduces the blast radius of potential security breaches."
+  },
+  {
+    "id": 23,
+    "domain": "Troubleshooting and Optimization",
+    "question": "How can you reduce cold start latency for a Lambda function that serves user-facing requests?",
+    "options": {
+      "A": "Increase the timeout",
+      "B": "Use provisioned concurrency",
+      "C": "Reduce the deployment package size",
+      "D": "Both B and C"
+    },
+    "answer": "D",
+    "explanation": "Provisioned concurrency keeps initialized instances ready to respond. Reducing deployment package size decreases initialization time. Both strategies reduce cold start latency."
+  },
+  {
+    "id": 24,
+    "domain": "Development with AWS Services",
+    "question": "Which Step Functions state type allows you to wait for a specific date/time before continuing?",
+    "options": {
+      "A": "Task",
+      "B": "Wait",
+      "C": "Pass",
+      "D": "Choice"
+    },
+    "answer": "B",
+    "explanation": "The Wait state in Step Functions pauses the state machine execution until a specified time or duration elapses, then transitions to the next state."
+  },
+  {
+    "id": 25,
+    "domain": "Deployment",
+    "question": "Which CodePipeline artifact store type should you use for cross-region deployments?",
+    "options": {
+      "A": "Amazon S3 in the pipeline region",
+      "B": "Amazon S3 in the deployment region",
+      "C": "Amazon EFS",
+      "D": "AWS CodeArtifact"
+    },
+    "answer": "A",
+    "explanation": "CodePipeline artifacts are stored in S3 in the pipeline's region. Cross-region action providers pull artifacts from the pipeline's artifact store regardless of their region."
+  },
+  {
+    "id": 26,
+    "domain": "Security",
+    "question": "What should you use to rotate an RDS database password without application downtime?",
+    "options": {
+      "A": "Manual rotation via AWS Console",
+      "B": "AWS Secrets Manager with automatic rotation",
+      "C": "AWS Systems Manager Parameter Store",
+      "D": "Hard-code in application config"
+    },
+    "answer": "B",
+    "explanation": "AWS Secrets Manager can automatically rotate RDS credentials using a Lambda function on a schedule you define, with zero downtime for the application."
+  },
+  {
+    "id": 27,
+    "domain": "Development with AWS Services",
+    "question": "Which ElastiCache engine is best for session storage requiring persistence?",
+    "options": {
+      "A": "Redis",
+      "B": "Memcached",
+      "C": "DynamoDB",
+      "D": "Aurora"
+    },
+    "answer": "A",
+    "explanation": "Redis supports data persistence (RDB snapshots and AOF logging), replication, and pub/sub. Memcached is purely in-memory with no persistence."
+  },
+  {
+    "id": 28,
+    "domain": "Troubleshooting and Optimization",
+    "question": "Which CloudWatch feature should you use to receive alerts when DynamoDB read capacity exceeds 80%?",
+    "options": {
+      "A": "CloudWatch Logs",
+      "B": "CloudWatch Alarms",
+      "C": "CloudWatch Dashboards",
+      "D": "CloudWatch Events"
+    },
+    "answer": "B",
+    "explanation": "CloudWatch Alarms monitor metrics and trigger actions (like SNS notifications) when thresholds are breached. You can set an alarm on ConsumedReadCapacityUnits."
+  },
+  {
+    "id": 29,
+    "domain": "Deployment",
+    "question": "Which AWS service provides a managed platform for running containerized applications without managing servers or clusters?",
+    "options": {
+      "A": "Amazon EC2",
+      "B": "AWS Fargate",
+      "C": "AWS Lambda",
+      "D": "AWS Elastic Beanstalk"
+    },
+    "answer": "B",
+    "explanation": "AWS Fargate is a serverless compute engine for containers that works with both ECS and EKS. It removes the need to provision and manage servers."
+  },
+  {
+    "id": 30,
+    "domain": "Development with AWS Services",
+    "question": "Which CloudFront feature should you use to serve dynamic content that changes based on user location?",
+    "options": {
+      "A": "Lambda@Edge",
+      "B": "CloudFront Cache Behaviors",
+      "C": "Origin Access Identity",
+      "D": "CloudFront Functions"
+    },
+    "answer": "A",
+    "explanation": "Lambda@Edge lets you run Lambda functions at CloudFront edge locations to customize content delivery based on request headers, user location, and more."
+  }
+]
